@@ -19,7 +19,7 @@ pocet = 0
 pocet_kopir = 0
 pocet_move = 0
 
-# methoda
+# methoda pro logovani co se deje
 def log2file(file, status, msg): 
     # Logovani souboru 
     timestamp = datetime.datetime.today()
@@ -44,14 +44,14 @@ for file in vycetka_files:
             # Pokud je soubor starsiho data tak se presune a nebude uz na disku
             if m_timestamp > s_timestamp:
                 # Pokusi se prekopirovat soubor na Google DRIVE
-                print("COPY - " + file + str(m_timestamp))
+                #print("COPY - " + file + str(m_timestamp))
                 shutil.copy(vycetka_path + "\\" + file, googledrive_path)
                 log2file(file, "INFO", "prekopirovan na Google Drive")
                 pocet_kopir = pocet_kopir + 1
 
             else:
                 # Pokusi se prekopirovat soubor na Google DRIVE
-                print("MOVE - " + file + str(m_timestamp))
+                #print("MOVE - " + file + str(m_timestamp))
                 shutil.move(vycetka_path + "\\" + file, googledrive_path)
                 log2file(file, "INFO", "presunut na Google Drive")
                 pocet_move = pocet_move + 1
@@ -68,7 +68,7 @@ for file in vycetka_files:
             raise Exception("ERROR - " + str(ex))
         
     else:
-        log2file("", "INFO", "neni k presunuti")
+        log2file("", "INFO", "neni co k presunuti")
 
 # konec 
 file_time = datetime.datetime.today()
