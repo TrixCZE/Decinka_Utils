@@ -20,7 +20,7 @@ vycetka_path = "C:\\DecinkaApp\\Vycetka"
 vycetka_files = os.listdir(vycetka_path)
 googledrive_path = get_gdrive()
 file_time = datetime.date.today()
-file_path = "C:\\DecinkaApp\\Logs\\file_2_gdrive-" + file_time.strftime("%Y-%m-%d") + ".txt"
+file_log_path = "C:\\DecinkaApp\\Logs\\file_2_gdrive-" + file_time.strftime("%Y-%m-%d") + ".txt"
 s_timestamp = datetime.datetime.today() - datetime.timedelta(30)
 
 # Promenna pro napocet poctu souboru
@@ -34,7 +34,7 @@ pocet_arch = 0
 def log2file(status, msg): 
     # Logovani souboru 
     timestamp = datetime.datetime.today()
-    with open(file_path, 'a') as file_txt:
+    with open(file_log_path, 'a') as file_txt:
         file_txt.write("["+ timestamp.strftime("%Y-%m-%d %H:%M:%S:%f") +"] [" + status + "] - " + msg + "\n")
 
 # Kontrola na nalezeni google disku
