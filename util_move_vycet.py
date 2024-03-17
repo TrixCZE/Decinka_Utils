@@ -20,11 +20,18 @@ pocet_kopir = 0
 pocet_move = 0
 
 # methoda pro logovani co se deje
-def log2file(file, status, msg): 
+def log2file(status, msg): 
     # Logovani souboru 
     timestamp = datetime.datetime.today()
     with open(file_path, 'a') as file_txt:
-        file_txt.write("["+ timestamp.strftime("%Y-%m-%d %H:%M:%S:%f") +"] [" + status + "] - Soubor " + file + " " + msg + "\n")
+        file_txt.write("["+ timestamp.strftime("%Y-%m-%d %H:%M:%S:%f") +"] [" + status + "] - " + msg + "\n")
+
+# methoda pro nalezeni jiz existujici soubor, aby se znovu nekopíroval
+def find_file_gdrive(file):
+    if googledrive_path.__contains__(file):
+        return True
+    else:
+        return False
 
 # Cyklus prochazeni souboru
 for file in vycetka_files:
@@ -41,34 +48,40 @@ for file in vycetka_files:
             modify_timestamp = os.path.getmtime(vycetka_path + "\\" + file)
             m_timestamp = datetime.datetime.fromtimestamp(modify_timestamp)
 
+            # dohledani jestli je již soubor archivovan
+            file_exist = find_file_gdrive(file)
+
             # Pokud je soubor starsiho data tak se presune a nebude uz na disku
-            if m_timestamp > s_timestamp:
+            if m_timestamp > s_timestamp and file_exist == False:
                 # Pokusi se prekopirovat soubor na Google DRIVE
-                #print("COPY - " + file + str(m_timestamp))
                 shutil.copy(vycetka_path + "\\" + file, googledrive_path)
-                log2file(file, "INFO", "prekopirovan na Google Drive")
+                log2file("INFO", "Soubor " + file + "byl prekopirovan na Google Drive")
                 pocet_kopir = pocet_kopir + 1
 
-            else:
+            elif file_exist == False :
                 # Pokusi se prekopirovat soubor na Google DRIVE
-                #print("MOVE - " + file + str(m_timestamp))
                 shutil.move(vycetka_path + "\\" + file, googledrive_path)
-                log2file(file, "INFO", "presunut na Google Drive")
+                log2file("INFO", "Soubor " + file + "presunut na Google Drive")
                 pocet_move = pocet_move + 1
+
+            else: 
+                # Již je vše archivovano, tak se soubor odmaze
+                os.remove(vycetka_path + "\\" + file)
+                log2file("INFO", "Soubor " + file + "je jiz archivovan na Google Drive, tak byl smazan z disku")
 
         # Pokud je jiz vycetka na Google Drive
         except shutil.Error as ex:
-            log2file(file, "WARN", "jiz je na Google Drive a bude vymazan. Chyba: " + str(ex))
+            log2file("WARN", "Soubor " + file + "jiz je na Google Drive a bude vymazan. Chyba: " + str(ex))
             pocet_move = pocet_move + 1
             os.remove(vycetka_path + "\\" + file)
 
         # Odchyceni chyby 
         except Exception as ex:
-            log2file(file, "ERROR", "se nepodařilo presunout " + str(ex))
+            log2file("ERROR", "Soubor " + file + "se nepodařilo presunout " + str(ex))
             raise Exception("ERROR - " + str(ex))
         
     else:
-        log2file("", "INFO", "neni co k presunuti")
+        log2file("INFO", "Neni co k presunuti, utilitka se ukončí")
 
 # konec 
 file_time = datetime.datetime.today()
