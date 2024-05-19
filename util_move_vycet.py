@@ -104,6 +104,7 @@ if googledrive_path != None:
     print("[" + file_time.strftime("%Y-%m-%d %H:%M:%S") +"] " + "- [INFO] - ARCHIVOVÁNO: " + str(pocet_arch))
     print("[" + file_time.strftime("%Y-%m-%d %H:%M:%S") +"] " + "- [INFO] - SMAZÁNO: " + str(pocet_del))
 
+    # Pokud se nic nezpracuje tak se to take zaloguje pro info
     if pocet_move == 0 and pocet_kopir == 0 and pocet_arch == 0 and pocet_del == 0:
         log2file("INFO", "Neni co k zpracovaní, utilitka se ukončí...")
 
