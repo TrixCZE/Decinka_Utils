@@ -10,6 +10,7 @@ from utils_main import *
 # Promenne 
 vycetka_path = "C:\\DecinkaApp\\Vycetka"
 vycetka_files = os.listdir(vycetka_path)
+log_file_name = "file_2_gdrive"
 googledrive_path = get_gdrive()
 s_timestamp = datetime.datetime.today() - datetime.timedelta(30)
 
@@ -44,40 +45,54 @@ if googledrive_path != None:
                 # Pokud je soubor novejsi nez 30 dnu a neni na google drive, tak se zkopiruje
                 if file_exist == False and m_timestamp > s_timestamp:
                     shutil.copy(vycetka_path + "\\" + file, googledrive_path)
-                    log2file("INFO", "Soubor " + file + " byl prekopirovan na Google Drive")
+                    log2file("INFO", 
+                             "Soubor " + file + " byl prekopirovan na Google Drive", 
+                             log_file_name)
                     pocet_kopir = pocet_kopir + 1
 
                 # Pokud je soubor starsi jak 30 dnu a neni na disku, tak se presune a nezustane na disku
                 elif file_exist == False:
                     shutil.move(vycetka_path + "\\" + file, googledrive_path)
-                    log2file("INFO", "Soubor " + file + " presunut na Google Drive")
+                    log2file("INFO", 
+                             "Soubor " + file + " presunut na Google Drive", 
+                             log_file_name)
                     pocet_move = pocet_move + 1
 
                 # Pokud soubor je jiz na disku a je starsi jak 30 dnu, tak se odmaze
                 elif file_exist == True and m_timestamp < s_timestamp: 
                     os.remove(vycetka_path + "\\" + file)
                     pocet_del = pocet_del + 1
-                    log2file("INFO", "Soubor " + file + " je jiz archivovan na Google Drive, tak byl smazan z disku")
+                    log2file("INFO", 
+                             "Soubor " + file + " je jiz archivovan na Google Drive, tak byl smazan z disku", 
+                             log_file_name)
 
                 # Pokud je file novejsi jak 30 dnu, je již na disku, tak se pouze zaloguje
                 else:
-                    log2file("INFO", "Soubor " + file + " je jiz archivovan na Google Drive, ale je novejsi jak 30 dnu, tak nebyl smazan")
+                    log2file("INFO", 
+                             "Soubor " + file + " je jiz archivovan na Google Drive, ale je novejsi jak 30 dnu, tak nebyl smazan", 
+                             log_file_name)
                     pocet_arch = pocet_arch + 1
 
             # Pokud je jiz vycetka na Google Drive nebo problem s shutil knihovnou
             except shutil.Error as ex:
-                log2file("ERROR", "Soubor " + file + " se nepodarilo presunout/zkopirovat na Google Drive " + str(ex))
+                log2file("ERROR", 
+                         "Soubor " + file + " se nepodarilo presunout/zkopirovat na Google Drive " + str(ex), 
+                         log_file_name)
                 pocet_move = pocet_move + 1
                 os.remove(vycetka_path + "\\" + file)
 
             # Odchyceni jinych chyb 
             except Exception as ex:
-                log2file("ERROR", "Soubor " + file + " se nepodařilo presunout z důvodu chyby: " + str(ex))
+                log2file("ERROR", 
+                         "Soubor " + file + " se nepodařilo presunout z důvodu chyby: " + str(ex), 
+                         log_file_name)
                 raise Exception("ERROR - " + str(ex))
         
         # Pokud neni co k presunuti, tak se to zaloguje    
         else:
-            log2file("INFO", "Neni co k presunuti, utilitka se ukončí")
+            log2file("INFO", 
+                     "Neni co k presunuti, utilitka se ukončí", 
+                     log_file_name)
 
     # konec utiliky + vypsani do logu
     file_time = datetime.datetime.today()
@@ -89,9 +104,13 @@ if googledrive_path != None:
 
     # Pokud se nic nezpracuje tak se to take zaloguje pro info
     if pocet_move == 0 and pocet_kopir == 0 and pocet_arch == 0 and pocet_del == 0:
-        log2file("INFO", "Neni co k zpracovaní, utilitka se ukončí...")
+        log2file("INFO", 
+                 "Neni co k zpracovaní, utilitka se ukončí...", 
+                 log_file_name)
 
 # Pokud se nenajde disk, tak se to zaloguje a vyhodi chyba
 else:
-    log2file("ERROR", "Nenalezen google disk na danem pc!")
+    log2file("ERROR", 
+             "Nenalezen google disk na danem pc!", 
+             log_file_name)
     raise RuntimeError

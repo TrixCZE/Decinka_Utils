@@ -7,10 +7,16 @@ import os
 
 # Metoda pro logovani udalosti do souboru
 file_time = datetime.date.today()
-file_log_path = "C:\\DecinkaApp\\Logs\\file_2_gdrive-" + file_time.strftime("%Y-%m-%d") + ".txt"
 
-def log2file(status, msg): 
+'''
+status => Status volani INFO, WARN, ERROR 
+msg => Zprava volani nejaky text ci cokoliv
+log_file_name => Nazev log souboru
+'''
+def log2file(status, msg, log_file_name): 
     # Logovani souboru 
+    file_log_path = "C:\\DecinkaApp\\Logs\\" + log_file_name + "-" + file_time.strftime("%Y-%m-%d") + ".txt"
+
     timestamp = datetime.datetime.today()
     with open(file_log_path, 'a') as file_txt:
         file_txt.write("["+ timestamp.strftime("%Y-%m-%d %H:%M:%S:%f") +"] [" + status + "] - " + msg + "\n")
