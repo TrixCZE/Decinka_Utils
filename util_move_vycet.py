@@ -1,7 +1,7 @@
 import os
 import shutil
 import datetime
-from utils_main import *
+from utils_main import log2file,get_gdrive
 
 # -------------------------------------------
 # Utilitka pro presun Vycetek na Google Drive
