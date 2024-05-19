@@ -35,7 +35,7 @@ def log2file(status, msg):
     # Logovani souboru 
     timestamp = datetime.datetime.today()
     with open(file_log_path, 'a') as file_txt:
-        file_txt.write("["+ timestamp.strftime("%Y-%m-%d %H:%M:%S:%f") +"] [" + status + "] - " + msg + "\n")
+        file_txt.write("["+ timestamp.strftime("%Y-%m-%d %H:%M:%S:%f") +"] - [" + status + "] - " + msg + "\n")
 
 # Kontrola na nalezeni google disku
 if googledrive_path != None:
@@ -98,11 +98,11 @@ if googledrive_path != None:
 
     # konec utiliky + vypsani do logu
     file_time = datetime.datetime.today()
-    print("[" + file_time.strftime("%Y-%m-%d %H:%M:%S") +"]" + " [INFO] - CELKEM DENNÍCH VÝČETEK: " + str(pocet))
-    print("[" + file_time.strftime("%Y-%m-%d %H:%M:%S") +"]" + " [INFO] - PRESUNUTO: " + str(pocet_move))
-    print("[" + file_time.strftime("%Y-%m-%d %H:%M:%S") +"]" + " [INFO] - PREKOPIROVANO: " + str(pocet_kopir))
-    print("[" + file_time.strftime("%Y-%m-%d %H:%M:%S") +"]" + " [INFO] - ARCHIVOVÁNO: " + str(pocet_arch))
-    print("[" + file_time.strftime("%Y-%m-%d %H:%M:%S") +"]" + " [INFO] - SMAZÁNO: " + str(pocet_del))
+    print("[" + file_time.strftime("%Y-%m-%d %H:%M:%S") +"] " + "- [INFO] - CELKEM DENNÍCH VÝČETEK: " + str(pocet))
+    print("[" + file_time.strftime("%Y-%m-%d %H:%M:%S") +"] " + "- [INFO] - PRESUNUTO: " + str(pocet_move))
+    print("[" + file_time.strftime("%Y-%m-%d %H:%M:%S") +"] " + "- [INFO] - PREKOPIROVANO: " + str(pocet_kopir))
+    print("[" + file_time.strftime("%Y-%m-%d %H:%M:%S") +"] " + "- [INFO] - ARCHIVOVÁNO: " + str(pocet_arch))
+    print("[" + file_time.strftime("%Y-%m-%d %H:%M:%S") +"] " + "- [INFO] - SMAZÁNO: " + str(pocet_del))
 
 # Pokud se nenajde disk, tak se to zaloguje a vyhodi chyba
 else:
