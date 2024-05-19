@@ -1,26 +1,16 @@
 import os
 import shutil
 import datetime
+from utils_main import *
 
 # -------------------------------------------
 # Utilitka pro presun Vycetek na Google Drive
 # -------------------------------------------
 
-# Dohledani google disku na PC
-def get_gdrive():
-    # Iterace nad pismeny
-    for drive_letter in range(ord('A'), ord('Z') + 1):
-        drive = chr(drive_letter) + ":\\Můj disk\\Vycetka"
-        if os.path.exists(drive):
-            return drive
-    return None
-
 # Promenne 
 vycetka_path = "C:\\DecinkaApp\\Vycetka"
 vycetka_files = os.listdir(vycetka_path)
 googledrive_path = get_gdrive()
-file_time = datetime.date.today()
-file_log_path = "C:\\DecinkaApp\\Logs\\file_2_gdrive-" + file_time.strftime("%Y-%m-%d") + ".txt"
 s_timestamp = datetime.datetime.today() - datetime.timedelta(30)
 
 # Promenna pro napocet poctu souboru
@@ -29,13 +19,6 @@ pocet_kopir = 0
 pocet_move = 0
 pocet_del = 0
 pocet_arch = 0
-
-# metoda pro logovani co se deje
-def log2file(status, msg): 
-    # Logovani souboru 
-    timestamp = datetime.datetime.today()
-    with open(file_log_path, 'a') as file_txt:
-        file_txt.write("["+ timestamp.strftime("%Y-%m-%d %H:%M:%S:%f") +"] [" + status + "] - " + msg + "\n")
 
 # Kontrola na nalezeni google disku
 if googledrive_path != None:
