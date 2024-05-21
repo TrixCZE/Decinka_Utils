@@ -16,6 +16,7 @@ db_dump_folder = "C:\\DecinkaApp\\DB_Backup"
 db_dumb_file = "DecinkaDB_backup_" + timestamp.strftime("%Y%m%d_%H%M%S") + ".sql"
 db_log_file = "database_dump_log"
 zip_file = "DecinkaDB_backup_" + timestamp.strftime("%Y%m%d_%H%M%S") + ".zip"
+mysql_dir = "C:\\Program Files\\MySQL\\MySQL Workbench 8.0\\"
 
 # Test pripojeni do databaze
 def check_db_connection():
@@ -41,7 +42,7 @@ def check_db_connection():
     except mysql.connector.Error as ex:
 
         # Vypisu chybu + ji zaloguju do souboru
-        print("Chyba při připojení do DB!")
+        print("Chyba při připojení do DB!" + ex)
         log2file("ERROR", 
                  "Chyba při připojení do DB! Nemohu pokračovat s dumpem databáze... MySQL Chyba: " + str(ex), 
                  db_log_file)
@@ -92,6 +93,7 @@ def run_database_backup():
     
     # Priprava prikazu pro vytvoreni zalohy
     command = [
+        mysql_dir +
         'mysqldump',
         '--user=' + mysql_username,
         '--password=' + mysql_password,
@@ -131,8 +133,10 @@ def run_database_backup():
 
             # Log do souboru
             log2file("ERROR", 
-                     "Záloha databáze byla úspěšně vytvořena! A ", 
+                     "Chyba při tvorbě zálohy databáze! Chyba byla: " + str(ex), 
                      db_log_file)
+            
+            raise Exception("DBUTIL_1 - Nepovedlo se vytvořit zálohu DB")
 
 # Zazipovani souboru           
 def zip_backup_file():
@@ -144,8 +148,8 @@ def zip_backup_file():
                  db_log_file)
         
         # Zacatek zipovani
-        with zipfile.ZipFile(zip_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            zipf.write(db_dumb_file, os.path.basename(db_dump_folder))
+        with zipfile.ZipFile(db_dump_folder + "\\" + zip_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            zipf.write(db_dump_folder + "\\" + db_dumb_file, os.path.basename(db_dump_folder))
 
         # Log do souboru
         print("ZIPovani souboru uspesne dokonceno!") 
@@ -155,10 +159,18 @@ def zip_backup_file():
 
     except zipfile.BadZipfile as ex:
         # Log do souboru
-        print("Chyba pri ZIPovani souboru " + ex)
+        print("Chyba pri ZIPovani souboru " + str(ex))
         log2file("ERROR", 
-                 "Nastala chyba při ZIPování souboru... Chyba byla: " + ex, 
+                 "Nastala chyba při ZIPování souboru... Chyba byla: " +str(ex), 
                  db_log_file)
+        
+# Odmazani souboru pokud vse dobehne
+def del_sql_file():
+
+    # Log do souboru 
+    log2file("INFO", 
+             "Odmazaní souboru", 
+             db_log_file)
 
 # Spusteni programu
 if check_db_connection(): 
