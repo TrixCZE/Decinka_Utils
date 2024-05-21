@@ -169,14 +169,37 @@ def del_sql_file():
 
     # Log do souboru 
     log2file("INFO", 
-             "Odmazaní souboru", 
+             "Začíná smazaní souboru .sql", 
+             db_log_file)
+    
+    # Kontrola 
+    if os.path.exists(db_dump_folder + "\\" + db_dumb_file):
+        os.remove(db_dump_folder + "\\" + db_dumb_file)
+        
+        # Log do souboru 
+        print("Soubor se zalohou .sql byl smazan")
+        log2file("INFO", 
+             "Soubor se zalohou .sql byl úspěšně smazán", 
              db_log_file)
 
 # Spusteni programu
 if check_db_connection(): 
+
+    # Log do souboru 
+    log2file("INFO", 
+            "########################################################################", 
+            db_log_file)
 
     # Spusteni zalohy
     run_database_backup()
 
     # Spusteni zazipovani vytvoreneho backupu
     zip_backup_file()
+
+    # Odmazani .sql souboru
+    del_sql_file()
+
+    # Log do souboru 
+    log2file("INFO", 
+            "Konec zálohy DB. Ukončuji utiliku...", 
+            db_log_file)
