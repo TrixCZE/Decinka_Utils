@@ -8,12 +8,14 @@ import os
 # Metoda pro logovani udalosti do souboru
 file_time = datetime.date.today()
 
-'''
-status => Status volani INFO, WARN, ERROR 
-msg => Zprava volani nejaky text ci cokoliv
-log_file_name => Nazev log souboru
-'''
 def log2file(status, msg, log_file_name): 
+    '''
+    Pouzite pro logovani zprav do souboru
+    
+    status (str) => Status volani INFO, WARN, ERROR 
+    msg (str) => Zprava volani nejaky text ci cokoliv
+    log_file_name (str) => Nazev log souboru
+    '''
     # Logovani souboru 
     file_log_path = "C:\\DecinkaApp\\Logs\\" + log_file_name + "-" + file_time.strftime("%Y-%m-%d") + ".txt"
 
@@ -23,6 +25,9 @@ def log2file(status, msg, log_file_name):
 
 # Dohledani google disku na PC
 def get_gdrive():
+    '''
+    Slouzi pro nalezeni google drive disku na PC
+    '''
     # Iterace nad pismeny
     for drive_letter in range(ord('A'), ord('Z') + 1):
         drive = chr(drive_letter) + ":\\Můj disk\\Vycetka"
