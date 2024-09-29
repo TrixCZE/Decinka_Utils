@@ -17,6 +17,7 @@ db_dumb_file = "DecinkaDB_backup_" + timestamp.strftime("%Y%m%d_%H%M%S") + ".sql
 db_log_file = "database_dump_log"
 zip_file = "DecinkaDB_backup_" + timestamp.strftime("%Y%m%d_%H%M%S") + ".zip"
 mysql_dir = "C:\\Program Files\\MySQL\\MySQL Workbench 8.0\\"
+database_schema_name = "vinarnadzakaznici"
 
 # Test pripojeni do databaze
 def check_db_connection():
@@ -103,6 +104,18 @@ def run_database_backup():
         '--routines',
         '--events'
     ]
+    
+    command = [
+        mysql_dir + 'mysqldump',
+        '--user=' + mysql_username,
+        '--password=' + mysql_password,
+        '--host=' + mysql_host,
+        '--databases',  # This is optional but good for clarity
+        database_schema_name,
+        '--single-transaction',
+        '--routines',
+        '--events',
+]
 
     # Log do souboru
     log2file("INFO", 
@@ -149,7 +162,7 @@ def zip_backup_file():
         
         # Zacatek zipovani
         with zipfile.ZipFile(db_dump_folder + "\\" + zip_file, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            zipf.write(db_dump_folder + "\\" + db_dumb_file, os.path.basename(db_dump_folder))
+            zipf.write(db_dump_folder + "\\" + db_dumb_file, os.path.basename(db_dumb_file))
 
         # Log do souboru
         print("ZIPovani souboru uspesne dokonceno!") 
@@ -200,6 +213,7 @@ if check_db_connection():
     del_sql_file()
 
     # Log do souboru 
+    print("Konec zálohy DB. Ukončuji utiliku...")
     log2file("INFO", 
             "Konec zálohy DB. Ukončuji utiliku...", 
             db_log_file)
