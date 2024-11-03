@@ -1,10 +1,6 @@
-import datetime
-import os
-import subprocess
-import mysql.connector
+import datetime, os, subprocess, mysql.connector, zipfile
 from Settings import mysql_host, mysql_username, mysql_password
 from Utilities.utils_main import log2file
-import zipfile
 
 # ---------------------------------------------
 # Utilitka pro vytvoreni dump souboru databaze
