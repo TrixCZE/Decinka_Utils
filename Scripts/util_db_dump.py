@@ -3,7 +3,7 @@ import os
 import subprocess
 import mysql.connector
 from Settings import mysql_host, mysql_username, mysql_password
-from utils_main import log2file
+from Utilities.utils_main import log2file
 import zipfile
 
 # ---------------------------------------------
@@ -195,25 +195,26 @@ def del_sql_file():
              "Soubor se zalohou .sql byl úspěšně smazán", 
              db_log_file)
 
-# Spusteni programu
-if check_db_connection(): 
+# Spusteni programu    
+def main():
+    if check_db_connection(): 
 
-    # Log do souboru 
-    log2file("INFO", 
-            "########################################################################", 
-            db_log_file)
+        # Log do souboru 
+        log2file("INFO", 
+                "########################################################################", 
+                db_log_file)
 
-    # Spusteni zalohy
-    run_database_backup()
+        # Spusteni zalohy
+        run_database_backup()
 
-    # Spusteni zazipovani vytvoreneho backupu
-    zip_backup_file()
+        # Spusteni zazipovani vytvoreneho backupu
+        zip_backup_file()
 
-    # Odmazani .sql souboru
-    del_sql_file()
+        # Odmazani .sql souboru
+        del_sql_file()
 
-    # Log do souboru 
-    print("Konec zálohy DB. Ukončuji utiliku...")
-    log2file("INFO", 
-            "Konec zálohy DB. Ukončuji utiliku...", 
-            db_log_file)
+        # Log do souboru 
+        print("Konec zálohy DB. Ukončuji utiliku...")
+        log2file("INFO", 
+                "Konec zálohy DB. Ukončuji utiliku...", 
+                db_log_file)
