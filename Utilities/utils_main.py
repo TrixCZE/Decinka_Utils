@@ -14,14 +14,15 @@ def PrintMSG(Level: str, Script_Name: str = '', Message: str = ''):
     Used to log information to command line only if the Log level is set to DEBUG or ERROR
     
     Agrs:
+        Level (str): Log level of message
         Script_Name (str): Name of script to print out
         Message (str): Actual message that should be print out
-    """   
-    if Level != 'Debug' and Log_Level != 'Debug':
-        print(f'[{Script_Name.upper()}] - [{Level.upper()}] - {Message}')
-    
-    else: 
+    """
+    if Level == 'Debug' and Log_Level == 'Debug':
         print(f'[{Script_Name.upper()}] - [DEBUG] - {Message}')
+        
+    elif Level != 'Debug' and Log_Level != 'Debug':
+        print(f'[{Script_Name.upper()}] - [{Level.upper()}] - {Message}')
 
 
 def log2file(status, msg, log_file_name): 
