@@ -247,7 +247,12 @@ def del_old_dumps(days: int):
         # provedu kontrolu jestli soubory jsou starsi jak nastavene datum
         if file_data.file_created < date_to_check:
             # pokud jsou smazu je 
-            PrintMSG('Debug', 'util_db_dump', f'Mazu soubor {file_name} starsi 14 dnum')
+            PrintMSG('Debug', 'util_db_dump', f'Mazu zalohu {file_name}, ktera je  starsi jak 14 dnu....')
+            log2file("INFO", 
+                    f"Zaloha {file_name} starsi jak 14 dnu byla smazana...", 
+                    db_log_file)
+            
+            # Smazani souboru
             os.remove(file_data.file_location)
             
     # Log do souboru 
