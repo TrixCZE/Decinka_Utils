@@ -1,19 +1,30 @@
-import datetime, os, subprocess, mysql.connector, zipfile
+import os, subprocess, mysql.connector, zipfile
 from Settings import mysql_host, mysql_username, mysql_password
 from Utilities.utils_main import log2file, PrintMSG
+from datetime import datetime, timedelta
 
 # ---------------------------------------------
 # Utilitka pro vytvoreni dump souboru databaze
 # ---------------------------------------------
 
 # Promenne 
-timestamp = datetime.datetime.today()
+timestamp = datetime.today()
 db_dump_folder = "C:\\DecinkaApp\\DB_Backup"
 db_dumb_file = "DecinkaDB_backup_" + timestamp.strftime("%Y%m%d_%H%M%S") + ".sql"
 db_log_file = "database_dump_log"
 zip_file = "DecinkaDB_backup_" + timestamp.strftime("%Y%m%d_%H%M%S") + ".zip"
 mysql_dir = "C:\\Program Files\\MySQL\\MySQL Workbench 8.0\\"
 database_schema_name = "vinarnadzakaznici"
+
+# Tridy
+class Dumb_File:
+    def __init__(self, file_name, file_created, file_size, file_size_kb, file_extension, file_location):
+        self.file_name = file_name
+        self.file_created = file_created
+        self.file_size = file_size
+        self.file_size_kb = file_size_kb
+        self.file_extension = file_extension
+        self.file_location = file_location
 
 # Test pripojeni do databaze
 def check_db_connection():
@@ -197,6 +208,53 @@ def del_sql_file():
         log2file("INFO", 
              "Soubor se zalohou .sql byl úspěšně smazán", 
              db_log_file)
+        
+# Odmazani starych zaloh vice jak specifikovane mnozstvi
+def del_old_dumps(days: int):
+    # Log do souboru 
+    PrintMSG('Debug', 'util_db_dump', f'Budu mazat zálohy co jsou starsi jak {days} dnu')
+    log2file("INFO", 
+            f"Budu mazat zálohy co jsou starsi jak {days} dnu", 
+            db_log_file)
+    
+    # Pomocna promenna 
+    Dumb_Files = {}
+    
+    # Ulozim si vsechny soubory do dictionary
+    for file in os.listdir(db_dump_folder):
+        
+        # Kontrola jestli se jedna o soubor
+        file_path = f'{db_dump_folder}\\{file}'
+        if os.path.isfile(file_path):
+            
+            # Ulozeni do objektu
+            BackUP_Files = Dumb_File(
+                file_name = file,
+                file_created = datetime.fromtimestamp(os.path.getctime(file_path)),
+                file_size = os.path.getsize(file_path),
+                file_size_kb = round(os.path.getsize(file_path) / 1024, 2),
+                file_extension = os.path.splitext(file_path)[1],
+                file_location = file_path
+            )
+            
+            # Ulozim si je do dict
+            Dumb_Files[BackUP_Files.file_name] = BackUP_Files
+
+    # Projdu soubory a smazu ty ktere jsou vytvorene dele jak stanovena doba
+    date_to_check = datetime.now() - timedelta(days=days)
+    
+    for file_name, file_data in Dumb_Files.items():
+        # provedu kontrolu jestli soubory jsou starsi jak nastavene datum
+        if file_data.file_created < date_to_check:
+            # pokud jsou smazu je 
+            PrintMSG('Debug', 'util_db_dump', f'Mazu soubor {file_name} starsi 14 dnum')
+            os.remove(file_data.file_location)
+            
+    # Log do souboru 
+    PrintMSG('Debug', 'util_db_dump', f'Zalohy starsi jak 14 dnu byly smazany')
+    log2file("INFO", 
+            f"Zalohy starsi jak 14 dnu byly smazany", 
+            db_log_file)
 
 # Spusteni programu    
 def main():
@@ -216,6 +274,9 @@ def main():
 
         # Odmazani .sql souboru
         del_sql_file()
+        
+        # Smazani starsich zaloh jak 14 dnu
+        del_old_dumps(days=14)
 
         # Log do souboru 
         PrintMSG('Info', 'util_db_dump', f'Konec zálohy DB. Ukončuji utiliku...')
