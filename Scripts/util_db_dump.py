@@ -1,6 +1,6 @@
 import datetime, os, subprocess, mysql.connector, zipfile
 from Settings import mysql_host, mysql_username, mysql_password
-from Utilities.utils_main import log2file
+from Utilities.utils_main import log2file, PrintMSG
 
 # ---------------------------------------------
 # Utilitka pro vytvoreni dump souboru databaze
@@ -27,6 +27,7 @@ def check_db_connection():
         )
 
         # Ukoncim pripojeni + zaloguju uspesny test
+        PrintMSG('Debug', 'util_db_dump', 'Úspěšné připojení do databáze! Mohu pokračovat s dumpem databáze...')
         log2file("INFO", 
                  "Úspěšné připojení do databáze! Mohu pokračovat s dumpem databáze...", 
                  db_log_file)
@@ -39,7 +40,7 @@ def check_db_connection():
     except mysql.connector.Error as ex:
 
         # Vypisu chybu + ji zaloguju do souboru
-        print("Chyba při připojení do DB!" + ex)
+        PrintMSG('ERROR', 'util_db_dump', f'Chyba při připojení do DB! Chyba: {ex}')
         log2file("ERROR", 
                  "Chyba při připojení do DB! Nemohu pokračovat s dumpem databáze... MySQL Chyba: " + str(ex), 
                  db_log_file)
@@ -49,12 +50,12 @@ def check_db_connection():
 
 # Kontrola jestli existuje adresar  
 def check_directory():
-    print("Kontroluji jestli existuje adresar DB_Backup...")
+    PrintMSG('Debug', 'util_db_dump', 'Kontroluji jestli existuje adresar DB_Backup...')
 
     if(os.path.exists(db_dump_folder)):
         
         # Vypis do logu
-        print("Adresar " + db_dump_folder + " existuje a tak ukoncuji kontrolu adresare...")
+        PrintMSG('Debug', 'util_db_dump', f'Adresar {db_dump_folder} existuje a tak ukoncuji kontrolu adresare...')
         log2file("INFO", 
                  "Adresar " + db_dump_folder + " existuje a tak ukoncuji kontrolu adresare...", 
                  db_log_file)
@@ -62,7 +63,7 @@ def check_directory():
     
     else: 
         # Vypis do logu
-        print("Adresar neni na disku... Bude vytvoren.")
+        PrintMSG('Debug', 'util_db_dump', f'Adresar neni na disku... Bude vytvoren.')
         log2file("INFO", 
                  "Adresář není na disku... Bude vytvořen.", 
                  db_log_file)
@@ -70,12 +71,14 @@ def check_directory():
         # Vytvoreni adresare + log do souboru
         try:
             os.makedirs(db_dump_folder)
+            PrintMSG('Debug', 'util_db_dump', f'Adresár byl vytvořen....')
             log2file("INFO", 
                  "Adresár byl vytvořen....", 
                  db_log_file)
             
         # Pokud se vyskytne chyba loguj   
         except OSError as ex:
+            PrintMSG('ERROR', 'util_db_dump', f'Adresár se nepodařilo vytvořit.... Chyba je: {ex}')
             log2file("ERROR", 
                  "Adresár se nepodařilo vytvořit.... Chyba je: " + ex, 
                  db_log_file)
@@ -84,12 +87,13 @@ def check_directory():
 def run_database_backup():
     
     # Log do souboru
+    PrintMSG('Debug', 'util_db_dump', f'Začíná záloha databáze...')
     log2file("INFO", 
              "Začíná záloha databáze...", 
              db_log_file)
     
     # Priprava prikazu pro vytvoreni zalohy
-    command = [
+    """command = [
         mysql_dir +
         'mysqldump',
         '--user=' + mysql_username,
@@ -99,14 +103,14 @@ def run_database_backup():
         '--single-transaction',
         '--routines',
         '--events'
-    ]
+    ]"""
     
     command = [
         mysql_dir + 'mysqldump',
         '--user=' + mysql_username,
         '--password=' + mysql_password,
         '--host=' + mysql_host,
-        '--databases',  # This is optional but good for clarity
+        '--databases',
         database_schema_name,
         '--single-transaction',
         '--routines',
@@ -114,6 +118,7 @@ def run_database_backup():
 ]
 
     # Log do souboru
+    PrintMSG('Debug', 'util_db_dump', f'Byl připraven command pro spuštění zálohy do souboru {db_dumb_file}! Dále se bude už zálohovat DB...')
     log2file("INFO", 
              "Byl připraven command pro spuštění zálohy do souboru " + db_dumb_file + "! Dále se bude už zálohovat DB...", 
              db_log_file)
@@ -127,9 +132,10 @@ def run_database_backup():
             
             # Spusteni procesu
             subprocess.run(command, stdout=dump, stderr=subprocess.PIPE, check=True)
-            print("Záloha se úspěšně provedla do souboru: "+ db_dumb_file)
+            PrintMSG('Debug', 'util_db_dump', f'Záloha se úspěšně provedla do souboru: {db_dumb_file}')
             
             # Log do souboru
+            PrintMSG('Debug', 'util_db_dump', f'Záloha databáze byla úspěšně vytvořena! A byla uložena do {db_dump_folder}\\{db_dumb_file}')
             log2file("INFO", 
                      "Záloha databáze byla úspěšně vytvořena! A byla uložena do " + db_dump_folder + "\\" + db_dumb_file, 
                      db_log_file)
@@ -138,7 +144,7 @@ def run_database_backup():
         except subprocess.CalledProcessError as ex:
             
             # Nastala chyba pri zalohovani
-            print("Nastala chyba pri vytvareni zalohy: " + ex.stderr.decode())
+            PrintMSG('Debug', 'util_db_dump', f'Nastala chyba pri vytvareni zalohy: {ex.stderr.decode()}')
 
             # Log do souboru
             log2file("ERROR", 
@@ -151,7 +157,7 @@ def run_database_backup():
 def zip_backup_file():
     try:
         # Log do souboru
-        print("Zacina ZIPovani souboru") 
+        PrintMSG('Debug', 'util_db_dump', f'Zacina ZIPovani souboru')
         log2file("INFO", 
                  "Začíná zipování backup souboru", 
                  db_log_file)
@@ -161,14 +167,14 @@ def zip_backup_file():
             zipf.write(db_dump_folder + "\\" + db_dumb_file, os.path.basename(db_dumb_file))
 
         # Log do souboru
-        print("ZIPovani souboru uspesne dokonceno!") 
+        PrintMSG('Debug', 'util_db_dump', f'ZIPovani souboru uspesne dokonceno!')
         log2file("INFO", 
                  "ZIPování backupu DB bylo úspěšně dokončeno!", 
                  db_log_file)
 
     except zipfile.BadZipfile as ex:
         # Log do souboru
-        print("Chyba pri ZIPovani souboru " + str(ex))
+        PrintMSG('Debug', 'util_db_dump', f'Chyba pri ZIPovani souboru {str(ex)}')
         log2file("ERROR", 
                  "Nastala chyba při ZIPování souboru... Chyba byla: " +str(ex), 
                  db_log_file)
@@ -177,6 +183,7 @@ def zip_backup_file():
 def del_sql_file():
 
     # Log do souboru 
+    PrintMSG('Debug', 'util_db_dump', f'Začíná smazaní souboru .SQL')
     log2file("INFO", 
              "Začíná smazaní souboru .sql", 
              db_log_file)
@@ -186,7 +193,7 @@ def del_sql_file():
         os.remove(db_dump_folder + "\\" + db_dumb_file)
         
         # Log do souboru 
-        print("Soubor se zalohou .sql byl smazan")
+        PrintMSG('Debug', 'util_db_dump', f'Soubor se zalohou .SQL byl smazan')
         log2file("INFO", 
              "Soubor se zalohou .sql byl úspěšně smazán", 
              db_log_file)
@@ -196,6 +203,7 @@ def main():
     if check_db_connection(): 
 
         # Log do souboru 
+        PrintMSG('Info', 'util_db_dump', f'Zacina script pro vytvoreni zalohy DB...')
         log2file("INFO", 
                 "########################################################################", 
                 db_log_file)
@@ -210,7 +218,7 @@ def main():
         del_sql_file()
 
         # Log do souboru 
-        print("Konec zálohy DB. Ukončuji utiliku...")
+        PrintMSG('Info', 'util_db_dump', f'Konec zálohy DB. Ukončuji utiliku...')
         log2file("INFO", 
                 "Konec zálohy DB. Ukončuji utiliku...", 
                 db_log_file)
