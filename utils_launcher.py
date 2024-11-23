@@ -12,7 +12,7 @@ The script executes:
 # Libraries
 # -----------------------------------------------------------
 import threading
-from Scripts.util_db_dump import main as Start_Database_Dump
+from Scripts.util_db_dump import Start_DB_Dump
 from Scripts.util_move_vycet import main as Start_Vycetka_Move
 
 # Execution of utilites
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     print("[INFO] - Decinka Utils Manager Launcher is starting....")
     
     # Multithreading execution setup
-    job1 = threading.Thread(target=Start_Database_Dump)
+    job1 = threading.Thread(target=Start_DB_Dump)
     job2 = threading.Thread(target=Start_Vycetka_Move)
 
     # Start execution

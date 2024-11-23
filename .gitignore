@@ -1,3 +1,4 @@
 # Nenahravat config s cestama a hesla pro stmp server
 __pycache__
 Settings.py
+.env

@@ -1,6 +1,5 @@
-import datetime
-import os
-from Settings import Log_Level
+import datetime, os
+from dotenv import load_dotenv
 
 # -----------------------------------------------------------------
 # Generic utilika slouzici pro zavolani vsemoznych funkci a method
@@ -17,7 +16,12 @@ def PrintMSG(Level: str, Script_Name: str = '', Message: str = ''):
         Level (str): Log level of message
         Script_Name (str): Name of script to print out
         Message (str): Actual message that should be print out
-    """    
+    """ 
+    # Ziskani promenne 
+    load_dotenv()
+    Log_Level = os.getenv("LOG_LEVEL")
+    
+    # Nastaveni logovani
     if Level == 'Debug' and Log_Level == 'Debug':
         print(f'[{Script_Name.upper()}] - [DEBUG] - {Message}')
         

@@ -1,7 +1,7 @@
-import os, subprocess, mysql.connector, zipfile
-from Settings import mysql_host, mysql_username, mysql_password
+import os, subprocess, mysql.connector, zipfile, time
 from Utilities.utils_main import log2file, PrintMSG
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 
 # ---------------------------------------------
 # Utilitka pro vytvoreni dump souboru databaze
@@ -15,6 +15,13 @@ db_log_file = "database_dump_log"
 zip_file = "DecinkaDB_backup_" + timestamp.strftime("%Y%m%d_%H%M%S") + ".zip"
 mysql_dir = "C:\\Program Files\\MySQL\\MySQL Workbench 8.0\\"
 database_schema_name = "vinarnadzakaznici"
+
+# Ziskani promennych z enviromentu
+load_dotenv()
+mysql_username = os.getenv("MYSQL_USERNAME")
+mysql_password = os.getenv("MYSQL_PASSWORD")
+mysql_host = os.getenv("MYSQL_HOST", "localhost")
+mysql_port = os.getenv("MYSQL_PORT", "3306")
 
 # Tridy
 class Dumb_File:
@@ -103,19 +110,7 @@ def run_database_backup():
              "Začíná záloha databáze...", 
              db_log_file)
     
-    # Priprava prikazu pro vytvoreni zalohy
-    """command = [
-        mysql_dir +
-        'mysqldump',
-        '--user=' + mysql_username,
-        '--password=' + mysql_password,
-        '--host=' + mysql_host,
-        '--all-databases',
-        '--single-transaction',
-        '--routines',
-        '--events'
-    ]"""
-    
+    # Pripava zalohovaciho commandu
     command = [
         mysql_dir + 'mysqldump',
         '--user=' + mysql_username,
@@ -262,7 +257,13 @@ def del_old_dumps(days: int):
             db_log_file)
 
 # Spusteni programu    
-def main():
+def Start_DB_Dump():
+
+    print('Test')
+    
+    Connection_DB = check_db_connection()
+    print(Connection_DB)
+    
     if check_db_connection(): 
 
         # Log do souboru 
@@ -288,3 +289,5 @@ def main():
         log2file("INFO", 
                 "Konec zálohy DB. Ukončuji utiliku...", 
                 db_log_file)
+        
+    print
