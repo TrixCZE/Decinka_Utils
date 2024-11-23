@@ -258,11 +258,6 @@ def del_old_dumps(days: int):
 
 # Spusteni programu    
 def Start_DB_Dump():
-
-    print('Test')
-    
-    Connection_DB = check_db_connection()
-    print(Connection_DB)
     
     if check_db_connection(): 
 
